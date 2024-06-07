@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">bedtime1</string>
+    <string name="start_button">Start</string>
+    <string name="create_story">story</string>
+    <string name="enter_characters">Enter</string>
+    <string name="moral">Moral</string>
+    <string name="length">Length</string>
+    <string name="create_button">Create</string>
+    <string name="short_length">short</string>
+    <string name="medium_length">medium</string>
+    <string name="long_length">long</string>
+    <string name="your_story">your story</string>
+
+
+
+</resources>

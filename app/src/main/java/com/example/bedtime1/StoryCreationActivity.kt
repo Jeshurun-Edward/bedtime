@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import android.util.Log
 import com.example.bedtime1.BuildConfig
 import com.example.bedtime1.StoryActivity
+import com.example.bedtime1.data.PromptResponse
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.BlockThreshold
 import com.google.ai.client.generativeai.type.HarmCategory
@@ -35,6 +36,8 @@ import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.MainScope
 //import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+
 //import kotlinx.coroutines.withContext
 
 
@@ -48,7 +51,7 @@ class StoryCreationActivity : AppCompatActivity() {
                 temperature = 0.4f
                 topK = 32
                 topP = 1f
-                maxOutputTokens = 4096
+                maxOutputTokens = 8000
             },
             safetySettings = listOf(
                 SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.MEDIUM_AND_ABOVE),
@@ -150,20 +153,33 @@ class StoryCreationActivity : AppCompatActivity() {
     private fun createStory(generativeModel: GenerativeModel, charactersInput: String, moralInput: String, selectedLength: String) {
         Log.d("BedtimeApp", "Characters: $charactersInput, Moral: $moralInput, Length: $selectedLength")
         val prompt = """Write a story which teaches moral: $moralInput, using the Characters: $charactersInput, story length should be: $selectedLength.
-        Always talk about the moral only in the end, build the story first with good scenes, helping the user to engage fully.
+        Always talk about the moral only in the end, build the story first with good scenes without specifying morals even in character description, only write
+        what's happening, helping the user to engage fully, don't usage complex words to describe scenes, write it in a way children would understand. In the end,
+        You are writing prompt to mobius model, write a one line prompt which creates a cartoon book cover image of story which instructs how the characters are supposed to be and in
+        what background. Give output as json with following keys- title, story, moral, imagePrompt, dont' write json just start the output with { 
         """.trimMargin()
 
         // Launch a coroutine for the suspend function call
         MainScope().launch {  // Use Dispatchers.IO for network calls
             val response = generativeModel.generateContent(prompt = prompt)
-            val storyText = response.text
+            val respText : String  = response.text.toString()
+
+            val resJson: PromptResponse =   Json.decodeFromString(respText)
+            Log.d("BedtimApp","reponse: $resJson")
+
+
+            val title =  resJson.title
+            val storyText = resJson.story
+            val moral = resJson.moral
+//            val imgPrompt = resJson.imagePrompt
+
 
             // Update UI with storyText on the main thread
 //            withContext(Dispatchers.Main) {
             when (selectedLength) {
-                "Short" -> storyText?.let { startActivityForStory(it, StoryActivity.SHORT_STORY_TYPE) }
-                "Medium" -> storyText?.let { startActivityForStory(it, StoryActivity.MEDIUM_STORY_TYPE) }
-                "Large" -> storyText?.let { startActivityForStory(it, StoryActivity.LARGE_STORY_TYPE) }
+                "Short" -> startActivityForStory(title, storyText, moral, StoryActivity.SHORT_STORY_TYPE)
+                "Medium" ->startActivityForStory(title, storyText, moral, StoryActivity.MEDIUM_STORY_TYPE)
+                "Large" -> startActivityForStory(title, storyText, moral, StoryActivity.LARGE_STORY_TYPE)
             }
 //            }
         }
@@ -176,9 +192,11 @@ class StoryCreationActivity : AppCompatActivity() {
         // intent.putExtra("length", selectedLength)
         // startActivity(intent)
 
-    private fun startActivityForStory(story: String, storyType: Int) {
+    private fun startActivityForStory(title: String, story: String, moral : String,storyType: Int) {
         val intent = Intent(this, StoryActivity::class.java)
+        intent.putExtra("title", title)
         intent.putExtra("story", story)
+        intent.putExtra("moral", moral)
         intent.putExtra("storyType", storyType)
         startActivity(intent)
     }

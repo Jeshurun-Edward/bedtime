@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.bedtime.StoryCreationActivity
-
+import com.example.bedtime1.ui.theme.StoriesScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     private fun startNextActivity() {
-        val intent = Intent(this, StoryCreationActivity::class.java)
+        val intent = Intent(this, StoriesScreen::class.java)
         startActivity(intent)
     }
 }

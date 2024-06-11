@@ -3,6 +3,11 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id ("kotlinx-serialization")
+
+
+
 }
 
 android {
@@ -24,6 +29,9 @@ android {
         //return empty key in case something goes wrong
         val API_KEY = properties.getProperty("API_KEY") ?: ""
         buildConfigField("String", "API_KEY", API_KEY)
+
+        val HF_TOKEN = properties.getProperty("HF_TOKEN") ?: ""
+        buildConfigField("String", "HF_TOKEN", HF_TOKEN)
 
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -51,6 +59,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -84,4 +93,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.google.ai.client.generativeai:generativeai:0.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+
 }

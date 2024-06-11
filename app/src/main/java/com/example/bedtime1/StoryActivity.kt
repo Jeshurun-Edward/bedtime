@@ -53,18 +53,21 @@ class StoryActivity : AppCompatActivity() {
         const val MEDIUM_STORY_TYPE = 2
         const val LARGE_STORY_TYPE = 3
     }
-
+    private var title = ""
     private var storyText = ""
+    private var moral = ""
     private var storyType = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        title = intent.getStringExtra("title")?:""
         storyText = intent.getStringExtra("story") ?: ""
+        moral = intent.getStringExtra("moral")?:""
         storyType = intent.getIntExtra("storyType", 0)
         setContent {
             Bedtime1Theme {
-                val scrollState = rememberScrollState()
+                val scrollState = rememberScrollState(0)
 
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Column(
@@ -73,13 +76,16 @@ class StoryActivity : AppCompatActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = stringResource(R.string.your_story),
-                            style = MaterialTheme.typography.bodySmall,
+                            text = title,
+                            style = MaterialTheme.typography.titleLarge,
                             textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(5.dp))
                         Text(text = storyText,
-                            style = MaterialTheme.typography.bodySmall) // Display the story text
+                            style = MaterialTheme.typography.bodySmall) // Display the story
+                        Spacer(modifier = Modifier.height(25.dp))
+                        Text(text = moral,
+                            style = MaterialTheme.typography.titleSmall)
                     }
                 }
             }
